@@ -9,7 +9,7 @@
 
 ##
 #
-# Copyright (C) 2022 Niklas Leukroth
+# Copyright (C) 2021 Kevin Matthes & 2022 Niklas Leukroth
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,32 +28,91 @@
 ##
 
 ################################################################################
-##
-#
-# Variables
-#
-##
-
-# Compiler flags
-DLLFLAG		:=	-D_MAKEDLL
-WINDOWSFLAG	:= 
-
-# Set Flag under Windows
-ifeq ($(OS),Windows_NT)
-	WINDOWSFLAG += -D_WINDOWS
 
 ##
 #
-# Build instructions
+# Variables.
 #
 ##
 
-#Extra build step under windows
-ellipse.dll: ellipse.o
-	g++ -o ellipse.dll ellipse.o -s -shared -Wl,--subsystem,windows,--out-implib,libellipse.a
-endif #ifeq(...)
+# Software.
+ARCHIVE	:= ar
+# ARCHIVE	:= x86_64-w64-mingw32-ar
+CC		:= g++
+# CC		:= x86_64-w64-mingw32-g++
+COPY	:= cp
+DOXYGEN	:= doxygen
+NEWDIR	:= mkdir
+REMOVE	:= rm
 
-# General build
-ellipse.o: ellipse.cpp ellipse.hpp
-	g++ -c -o ellipse.o ellipse.cpp $(WINDOWSFLAG) $(DLLFLAG)
+# Software flags.
+AFLAGS		:= rs
+CFLAGS		:= -std=c++11 -Wall -Werror -Wextra -Wpedantic -D__ELLIPSE_INTERNAL__
+LFLAGS		:= -lm
+DLLFLAGS	:= -s -shared -Wl,--subsystem,windows,--out-implib,libellipse.a
+WINFLAGS	:= -D_WINDOWS -D_MAKEDLL
+
+# Make directories.
+MDOX	:= -C ../.docs/latex/
+
+# Directories.
+LIBDIR	:= ../../lib/
+DIRS	:= $(LIBDIR)
+
+# Library compilation requirements.
+HEADERS	:= $(wildcard ./*.hpp)
+LIBRARY	:= ./libellipse.a
+DLL 	:= ./ellipse.dll
+SOURCE	:= $(wildcard ./*.cpp)
+OBJECTS	:= $(subst .cpp,.o, $(SOURCE))
+
+# Concrete files.
+DOXYFILE	:= ./doxygen.cfg
+SELF		:= ./makefile
+
+
+
+##
+#
+# Build instructions.
+#
+##
+
+.PHONY: default doxygen library submodule tidy
+
+default: library
+
+$(DIRS):
+	$(NEWDIR) $@
+
+doxygen: $(wildcard ./*.dox) $(HEADERS) $(SOURCE)
+	$(DOXYGEN) $(DOXYFILE)
+	make $(MDOX) all
+
+library: $(LIBRARY)
+
+DLL : ellipse.o
+	$(CC) $(CFLAGS) -o ellipse.dll ellipse.o $(DLLFLAGS)
+
+$(LIBRARY): $(OBJECTS)
+#In case of windows, create a dll
+ifeq ($(OS),Windows_NT) 
+	-@make DLL
+endif
+	$(ARCHIVE) $(AFLAGS) $@ $^
+
+$(OBJECTS): $(SOURCE)
+#In case of windows, compile with the windows specific flags
+ifeq ($(OS),Windows_NT) 
+	$(CC) $(CFLAGS) -c $(LFLAGS) $(WINFLAGS) $^
+else
+	$(CC) $(CFLAGS) -c $(LFLAGS) $^
+endif
+
+submodule: $(HEADERS) $(LIBRARY) $(LIBDIR)
+	$(COPY) $(HEADERS) $(LIBRARY) $(LIBDIR)
+	make tidy
+
+tidy: $(LIBRARY) $(OBJECTS)
+	$(REMOVE) $^
 ################################################################################
