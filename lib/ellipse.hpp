@@ -62,51 +62,51 @@
 #include <vector>
 
 
-	using std::abs;
-	using std::acos;
-	using std::cos;
-	using std::function;
-	using std::sin;
-	using std::sqrt;
-	using std::vector;
+using std::abs;
+using std::acos;
+using std::cos;
+using std::function;
+using std::sin;
+using std::sqrt;
+using std::vector;
 
 
 
-	/*
-	 * Class definition.
-	 */
+/*
+* Class definition.
+*/
 
-	class EXPORT Ellipse
-	{
-	private:
-		float   major{ 0. };
-		float   minor{ 0. };
+class EXPORT Ellipse
+{
+private:
+	float   major{ 0. };
+	float   minor{ 0. };
 
-		function <float(const float)>  x
-		{ [=](const float t) -> float {return cos(t); } };
+	function <float(const float)>  x
+	{ [=](const float t) -> float {return cos(t); } };
 
-		function <float(const float)>  y
-		{ [=](const float t) -> float {return sin(t); } };
+	function <float(const float)>  y
+	{ [=](const float t) -> float {return sin(t); } };
 
-		function <float(const float)>  z
-		{ [=](const float t) -> float {return 0.f * t; } };
+	function <float(const float)>  z
+	{ [=](const float t) -> float {return 0.f * t; } };
 
-	public:
-		Ellipse(const float r
-			, const float e
-			, const float cx
-			, const float cy
-			, const float cz
-			, const float tx
-			, const float ty
-			, const float tz
-			, const float nx
-			, const float ny
-			, const float nz
-		);
+public:
+	Ellipse(const float r
+		, const float e
+		, const float cx
+		, const float cy
+		, const float cz
+		, const float tx
+		, const float ty
+		, const float tz
+		, const float nx
+		, const float ny
+		, const float nz
+	);
 
-		vector <float> eval(const float t);
-	};
+	vector <float> eval(const float t);
+};
 
 /*
  * End of header.
