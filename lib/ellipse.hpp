@@ -76,7 +76,7 @@ using std::vector;
 * Class definition.
 */
 
-class EXPORT Ellipse
+class Ellipse
 {
 private:
 	float   major{ 0. };
@@ -92,7 +92,7 @@ private:
 	{ [=](const float t) -> float {return 0.f * t; } };
 
 public:
-	Ellipse(const float r
+	EXPORT Ellipse(const float r
 		, const float e
 		, const float cx
 		, const float cy
@@ -105,7 +105,7 @@ public:
 		, const float nz
 	);
 
-	vector <float> eval(const float t);
+	EXPORT vector <float> eval(const float t);
 };
 
 /*
