@@ -96,18 +96,13 @@ DLL : ellipse.o
 
 $(LIBRARY): $(OBJECTS)
 #In case of windows, create a dll
-ifeq ($(OS),Windows_NT) 
-	-@make DLL
-endif
+	@make DLL
 	$(ARCHIVE) $(AFLAGS) $@ $^
 
 $(OBJECTS): $(SOURCE)
 #In case of windows, compile with the windows specific flags
-ifeq ($(OS),Windows_NT) 
 	$(CC) $(CFLAGS) -c $(LFLAGS) $(WINFLAGS) $^
-else
-	$(CC) $(CFLAGS) -c $(LFLAGS) $^
-endif
+
 
 submodule: $(HEADERS) $(LIBRARY) $(LIBDIR)
 	$(COPY) $(HEADERS) $(LIBRARY) $(LIBDIR)
